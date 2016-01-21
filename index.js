@@ -9,7 +9,7 @@ var exec = require('child_process').exec,
 function color(used, total) {
   var quadrant = Math.min(Math.ceil( Math.floor(used / total * 100) / 33), 3),
       cols = [ colors.greenB, colors.greenB, colors.yellowB, colors.redB ];
-  return cols[quadrant] + bytes(used) + colors.clear + ' / ' + bytes(total);
+  return (cols[quadrant] + bytes(used) + colors.clear + ' / ' + bytes(total)).replace('gb', 'GB');
 }
 
 var result = {
@@ -17,7 +17,7 @@ var result = {
       hostname: { key: 'Hostname', value: os.hostname() },
       uptime: { key: 'Uptime', value: elapsed(os.uptime()) },
       cpu: { key: 'CPU', value: os.cpus()[0].model.replace('Intel(R) Core(TM) ', 'Intel ').replace('Intel(R) Core(TM)2 ', 'Intel ') },
-      ram: { key: 'RAM', value: color( os.totalmem() - os.freemem(), os.totalmem()) },
+      ram: { key: 'RAM', value: color( os.totalmem() - os.freemem(), os.totalmem()).replace('gb', 'GB') },
       sh: { key: 'Shell', value: process.env.SHELL && process.env.SHELL.split('/').pop() },
       term: { key: 'Terminal', value: process.env.TERM && process.env.TERM.split('/').pop() }
     },
@@ -193,7 +193,7 @@ var tasks = [
           var total = stdout.trim().split('\n').pop(),
               used = total.split(/\s+/)[3],
               free = total.split(/\s+/)[2];
-          result.disk = { key: 'Disk', value: used + ' / ' + free };
+          result.disk = { key: 'Disk', value: (used + ' / ' + free).replace('gb', 'GB') };
           done();
         });
         break;
@@ -224,7 +224,7 @@ var tasks = [
                 return prev + parseInt(item['Size'] || 0, 10);
               }, 0),
               used = total - free;
-          result.disk = { key: 'Disk', value: color( used, total) };
+          result.disk = { key: 'Disk', value: color( used, total).replace('gb', 'GB') };
           done();
         });
         break;
@@ -233,7 +233,7 @@ var tasks = [
           var total = stdout.trim().split('\n').pop(),
               used = total.split(/\s+/)[3],
               free = total.split(/\s+/)[2];
-          result.disk = { key: 'Disk', value: used + ' / ' + free };
+          result.disk = { key: 'Disk', value: (used + ' / ' + free).replace('gb', 'GB') };
           done();
         });
     }
